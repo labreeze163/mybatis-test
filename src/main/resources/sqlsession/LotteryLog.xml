@@ -1,0 +1,137 @@
+<?xml version = "1.0" encoding = "UTF-8"  ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LotteryLog">
+    <resultMap id="lotteryLogMap" type="TurnPlateUserAward">
+    <result column="ID" property="id"  jdbcType="VARCHAR"/>
+    <result column="ACCOUNT_ID" property="accountID" jdbcType="VARCHAR"/>
+    <result column="IP" property="ip"  jdbcType="VARCHAR"/>
+    <result column="PROVINCE" property="province"  jdbcType="VARCHAR"/>
+    <result column="LOTTERY_TYPE" property="lotteryType"  jdbcType="DECIMAL"/>
+    <result column="COST_POINT" property="costPoint"  jdbcType="DECIMAL"/>
+    <result column="AWARD_ID" property="awardID"  jdbcType="VARCHAR"/>
+    <result column="AWARD_NAME" property="awardName"  jdbcType="VARCHAR"/>
+    <result column="AWARD_TYPE" property="awardType"  jdbcType="DECIMAL"/>
+    <result column="AWARD_INFO" property="awardInfo"  jdbcType="VARCHAR"/>
+    <result column="CREATE_TIME"  property="createTime"  jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="lotteryLogColumn">
+      ID, ACCOUNT_ID, IP, PROVINCE, LOTTERY_TYPE, COST_POINT, AWARD_ID, AWARD_NAME, AWARD_TYPE, AWARD_INFO, CREATE_TIME
+    </sql>
+
+    <select id="test" parameterType="java.lang.String" resultMap="lotteryLogMap">
+        select <include refid="lotteryLogColumn" /> from  TB_LOTTERY_LOG where id = '1'
+    </select>
+
+    <select id="getYesterdayUserAwards" parameterType="java.util.Map" resultMap="lotteryLogMap">
+        SELECT <include refid="lotteryLogColumn" /> FROM  (
+        SELECT TB_LOTTERY_LOG_OUTER.*, ROWNUM  as ROW_NUMBER   FROM (
+        SELECT * FROM TB_LOTTERY_LOG WHERE 1 = 1
+        <![CDATA[
+                   AND CREATE_TIME  <= #{endTime, jdbcType=TIMESTAMP}
+                ]]>
+        AND  LOTTERY_TYPE = #{lotteryType,jdbcType=DECIMAL}
+        ORDER BY CREATE_TIME DESC
+        ) TB_LOTTERY_LOG_OUTER
+        WHERE
+        <![CDATA[
+              ROWNUM <= ${pageSize}
+             ]]>
+        )
+        WHERE ROW_NUMBER >= 1
+    </select>
+
+    <select id="getUserAwardsByUserName" parameterType="java.util.Map" resultMap="lotteryLogMap">
+        SELECT * FROM (
+          SELECT TB_LOTTER_LOG_OUTER.*, ROWNUM  as ROW_NUMBER  FROM (
+            SELECT * FROM TB_LOTTERY_LOG WHERE ACCOUNT_ID = #{accountID} AND LOTTERY_TYPE = #{lotteryType,jdbcType=DECIMAL}
+                ORDER BY CREATE_TIME DESC
+            ) TB_LOTTER_LOG_OUTER
+            WHERE
+            <![CDATA[
+              ROWNUM <= ${endNumber}
+             ]]>
+          )
+        WHERE ROW_NUMBER >= ${beginNumber}
+    </select>
+
+
+    <insert id="insertTbLotteryLog" parameterType="TurnPlateUserAward">
+        INSERT INTO  TB_LOTTERY_LOG
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null">
+                id,
+            </if>
+            <if test="accountID != null">
+                ACCOUNT_ID,
+            </if>
+            <if test="ip != null">
+                ip,
+            </if>
+            <if test="province != null">
+                province,
+            </if>
+            <if test="lotteryType != null">
+                LOTTERY_TYPE,
+            </if>
+            <if test="costPoint != null">
+                COST_POINT,
+            </if>
+            <if test="awardID != null">
+                AWARD_ID,
+            </if>
+            <if test="awardName != null">
+                AWARD_NAME,
+            </if>
+            <if test="awardType != null">
+                AWARD_TYPE,
+            </if>
+            <if test="awardInfo != null">
+                AWARD_INFO,
+            </if>
+            <if test="createTime != null">
+                CREATE_TIME,
+            </if>
+        </trim>
+
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="accountID != null">
+                #{accountID,jdbcType=VARCHAR},
+            </if>
+            <if test="ip != null">
+                #{ip,jdbcType=VARCHAR},
+            </if>
+            <if test="province != null">
+                #{province,jdbcType=VARCHAR},
+            </if>
+            <if test="lotteryType != null">
+                #{lotteryType,jdbcType=DECIMAL},
+            </if>
+            <if test="costPoint != null">
+                #{costPoint,jdbcType=DECIMAL},
+            </if>
+            <if test="awardID != null">
+                #{awardID,jdbcType=VARCHAR},
+            </if>
+            <if test="awardName != null">
+                #{awardName,jdbcType=VARCHAR},
+            </if>
+            <if test="awardType != null">
+                #{awardType,jdbcType=DECIMAL},
+            </if>
+            <if test="awardInfo != null">
+                #{awardInfo,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+
+        </trim>
+
+    </insert>
+
+</mapper>
