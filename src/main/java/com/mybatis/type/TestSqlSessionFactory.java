@@ -23,7 +23,6 @@ public class TestSqlSessionFactory {
      * 得到某天的结束时间
      *
      * @return
-     * @author linjingu<hzlinjingu@corp.netease.com>
      * @since 2015年10月31日
      */
     public static long getEndOfDate(int days) {
